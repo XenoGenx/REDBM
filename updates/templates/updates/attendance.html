@@ -23,7 +23,7 @@
   </div>
   <div class="mt-4">
     <label class="form-label" for="evidence">รูปหลักฐานรวม (ไม่บังคับ)</label>
-    <input class="form-control" id="evidence" name="evidence" type="file" accept="image/*" capture="environment">
+    <input class="form-control" id="evidence" name="evidence" type="file" accept="image/*">
     {% if record.evidence %}<div class="mt-2"><a href="{{ record.evidence.url }}" target="_blank" rel="noopener">ดูรูปหลักฐานที่แนบไว้</a></div>{% endif %}
     <p class="evidence-note">รูปนี้ใช้เป็นหลักฐานการเข้าร่วมของคณะเท่านั้น</p>
   </div>
