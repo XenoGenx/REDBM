@@ -42,3 +42,4 @@ waitress-serve --listen=0.0.0.0:${PORT:-8000} redfrontier.wsgi:application
 ให้ reverse proxy (เช่น Nginx) จัดการ HTTPS และเสิร์ฟไฟล์ใน `MEDIA_ROOT` ที่ URL `/media/`; WhiteNoise จัดการไฟล์ static ให้แล้ว ห้ามใช้ `runserver` ใน production
 
 เว็บนี้ใช้ SQLite และ media บน filesystem จึงต้องเลือกบริการที่มี persistent disk หรือย้ายฐานข้อมูล/รูปไปบริการถาวรก่อนใช้บนแพลตฟอร์มที่ลบไฟล์ทุกครั้งที่ deploy# RedBm
+# REDBM
