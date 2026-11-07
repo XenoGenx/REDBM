@@ -1,0 +1,14 @@
+{% extends 'updates/base.html' %}
+{% load static %}
+{% block title %}ประธานสี | THE RED FRONTIER{% endblock %}
+{% block content %}
+<section class="panel mx-auto" style="max-width:480px">
+  <div class="text-center mb-3"><img class="login-mark" src="{% static 'images/logo.png' %}" alt="ตราคณะสีแดง"><p class="eyebrow mt-2">THE RED FRONTIER</p><h1 class="h3">เข้าสู่หน้าประธานสี</h1></div>
+  <form method="post" novalidate>{% csrf_token %}
+    {% for error in form.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+    <div class="mb-3"><label class="form-label" for="id_password">{{ form.password.label }}</label><div class="input-group"><input class="form-control" type="password" name="password" id="id_password" autocomplete="current-password" required><button class="btn btn-outline-red" type="button" data-show-password="id_password" aria-label="แสดงรหัสผ่าน"><i class="bi bi-eye" aria-hidden="true"></i></button></div>{% for error in form.password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}</div>
+    <button class="btn btn-primary w-100" type="submit"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> เข้า</button>
+  </form>
+  <div class="text-center mt-3"><a href="{% url 'home' %}">กลับหน้าแรก</a></div>
+</section>
+{% endblock %}

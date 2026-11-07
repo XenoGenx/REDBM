@@ -1,0 +1,74 @@
+{% extends 'updates/base.html' %}
+{% load thai_dates %}
+{% block title %}แดชบอร์ดประธาน | THE RED FRONTIER{% endblock %}
+{% block content %}
+<section class="section-heading"><div><p class="eyebrow">{{ today|thai_date }}</p><h1 class="display-title">แดชบอร์ดประธานสี</h1></div></section>
+<nav class="president-nav" aria-label="เมนูประธาน">
+  <a class="btn btn-gold" href="{% url 'president_notice_new' %}"><i class="bi bi-megaphone" aria-hidden="true"></i> โพสต์ประกาศ/มอบหมายงาน</a>
+  <form method="post" action="{% url 'president_logout' %}">{% csrf_token %}<button class="btn btn-outline-red" type="submit"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> ออกจากระบบ</button></form>
+</nav>
+<section>
+  <div class="section-heading"><div><p class="eyebrow">ภาพรวมวันนี้</p><h2>สถานะ 3 ฝ่าย</h2></div></div>
+  <div class="dashboard-grid">
+    {% for card in department_cards %}
+      <article class="dashboard-card" style="--dept-color: {{ card.color }}">
+        <h2>{{ card.name }}</h2>
+        {% if card.has_today_log %}<p class="mb-2"><span class="status-tag status-normal"><i class="bi bi-check-circle" aria-hidden="true"></i> ลงบันทึกวันนี้แล้ว</span></p>{% else %}<p class="mb-2"><span class="status-tag status-issue"><i class="bi bi-exclamation-circle" aria-hidden="true"></i> ยังไม่ลงบันทึกวันนี้</span></p>{% endif %}
+        {% if card.latest_log %}
+          <div class="entry-meta">ความคืบหน้าล่าสุด · {{ card.latest_log.date|thai_date }}</div>
+          <div class="d-flex align-items-center gap-2 mt-2"><div class="progress flex-grow-1"><div class="progress-bar {% if card.latest_log.progress < 34 %}progress-low{% elif card.latest_log.progress < 67 %}progress-medium{% else %}progress-high{% endif %}" style="width:{{ card.latest_log.progress }}%"></div></div><strong>{{ card.latest_log.progress }}%</strong></div>
+          <div class="mt-2">{% with log=card.latest_log %}{% include 'updates/_status.html' %}{% endwith %}</div>
+          <a class="d-inline-block mt-2" href="{% url 'log_detail' slug=card.slug pk=card.latest_log.pk %}">เปิดบันทึกล่าสุด</a>
+        {% else %}<p class="subtle">ยังไม่มีบันทึก</p>{% endif %}
+        <div class="attendance-counts"><span>มา {{ card.counts.present }}</span><span>ขาด {{ card.counts.absent }}</span><span>ลา {{ card.counts.leave }}</span></div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <div class="section-heading"><div><p class="eyebrow">ต้องติดตาม</p><h2>ปัญหาด่วนที่ยังไม่แก้</h2></div></div>
+  {% if urgent_logs %}<div class="log-list">{% for log in urgent_logs %}<article class="log-entry" style="--dept-color:#B3261E">
+    <div class="entry-top"><h3>{{ log.get_department_display }} · {{ log.author_name }}</h3><span class="entry-meta">{{ log.date|thai_date }}</span></div>
+    <p class="entry-preview">{{ log.issue|default:log.work_done|truncatechars:180 }}</p>
+    <a class="btn btn-outline-red mt-3" href="{% url 'log_detail' slug=log.department pk=log.pk %}"><i class="bi bi-chat-dots" aria-hidden="true"></i> เปิดและคอมเมนต์</a>
+    <form class="d-inline-block" method="post" action="{% url 'president_log_delete' pk=log.pk %}" onsubmit="return confirm('ยืนยันลบบันทึกนี้?')">{% csrf_token %}<button class="btn btn-danger-soft mt-3" type="submit"><i class="bi bi-trash" aria-hidden="true"></i> ลบ</button></form>
+  </article>{% endfor %}</div>{% else %}<div class="empty-state">ไม่มีปัญหาด่วนที่ค้างอยู่</div>{% endif %}
+</section>
+
+<section>
+  <div class="section-heading"><div><p class="eyebrow">จากบันทึกทุกฝ่าย</p><h2>ปัญหาที่พบล่าสุด</h2></div></div>
+  {% if issue_logs %}<div class="log-list">{% for log in issue_logs %}<article class="log-entry dashboard-issue">
+    <div class="entry-top"><h3>{{ log.get_department_display }} · {{ log.author_name }}</h3><span class="entry-meta">{{ log.date|thai_date }}</span></div>
+    <p class="entry-preview">{{ log.issue|truncatechars:240 }}</p>
+    {% if log.is_resolved %}<span class="status-tag status-normal"><i class="bi bi-check-circle" aria-hidden="true"></i> แก้ปัญหาแล้ว</span>{% else %}<span class="status-tag status-issue"><i class="bi bi-exclamation-circle" aria-hidden="true"></i> ยังไม่แก้ปัญหา</span>{% endif %}
+    <a class="btn btn-outline-red mt-3" href="{% url 'log_detail' slug=log.department pk=log.pk %}"><i class="bi bi-chat-dots" aria-hidden="true"></i> เปิดและคอมเมนต์</a>
+  </article>{% endfor %}</div>{% else %}<div class="empty-state">ยังไม่มีการแจ้งปัญหาในบันทึก</div>{% endif %}
+</section>
+
+<section>
+  <div class="section-heading"><div><p class="eyebrow">ประกาศและงาน</p><h2>รายการล่าสุด</h2></div><a href="{% url 'president_notice_new' %}">เพิ่มรายการ</a></div>
+  {% if notices %}<div class="notice-list">{% for notice in notices %}<article class="notice-entry">
+    <div class="entry-top"><h3>{{ notice.title }}</h3><span class="entry-meta">{{ notice.get_recipient_display }}</span></div><p class="entry-preview">{{ notice.content|truncatechars:150 }}</p>
+    {% if notice.deadline %}<div class="entry-meta mt-2">กำหนดส่ง {{ notice.deadline|thai_date }} · {{ notice.get_task_status_display }}</div>{% endif %}
+    <div class="d-flex gap-2 mt-3"><a class="btn btn-outline-red" href="{% url 'president_notice_edit' pk=notice.pk %}"><i class="bi bi-pencil" aria-hidden="true"></i> แก้ไข</a><form method="post" action="{% url 'president_notice_delete' pk=notice.pk %}" onsubmit="return confirm('ยืนยันลบรายการนี้?')">{% csrf_token %}<button class="btn btn-danger-soft" type="submit"><i class="bi bi-trash" aria-hidden="true"></i> ลบ</button></form></div>
+  </article>{% endfor %}</div>{% else %}<div class="empty-state">ยังไม่มีประกาศหรืองาน</div>{% endif %}
+</section>
+
+<section>
+  <div class="section-heading"><div><p class="eyebrow">รายชื่อสำหรับเช็คชื่อ</p><h2>รายชื่อทุกฝ่าย</h2></div></div>
+  {% if people %}
+    <div class="staff-search mb-3">
+      <label class="visually-hidden" for="staff-search-input">ค้นหารายชื่อสตาฟ</label>
+      <div class="input-group">
+        <span class="input-group-text" aria-hidden="true"><i class="bi bi-search"></i></span>
+        <input class="form-control" id="staff-search-input" type="search" placeholder="ค้นหาชื่อหรือฝ่าย" autocomplete="off" aria-controls="staff-list">
+      </div>
+      <div class="staff-search-count entry-meta mt-2" id="staff-search-count" aria-live="polite">ทั้งหมด {{ people|length }} คน</div>
+    </div>
+    <div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>ชื่อ</th><th>ฝ่าย</th><th class="text-end">จัดการ</th></tr></thead><tbody id="staff-list">
+    {% for person in people %}<tr class="staff-row"><td>{{ person.name }}</td><td>{{ person.get_department_display }}</td><td class="text-end"><form method="post" action="{% url 'president_person_delete' pk=person.pk %}" onsubmit="return confirm('ยืนยันลบรายชื่อนี้?')">{% csrf_token %}<button class="btn btn-danger-soft" type="submit"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">ลบ {{ person.name }}</span></button></form></td></tr>{% endfor %}
+    <tr id="staff-search-empty" hidden><td colspan="3" class="text-center">ไม่พบรายชื่อที่ตรงกัน</td></tr>
+  </tbody></table></div>{% else %}<div class="empty-state">ยังไม่มีรายชื่อ</div>{% endif %}
+</section>
+{% endblock %}

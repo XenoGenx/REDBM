@@ -1,0 +1,5 @@
+Django>=5.2,<5.3
+Pillow>=11.0
+python-dotenv>=1.0
+whitenoise>=6.8
+waitress>=3.0

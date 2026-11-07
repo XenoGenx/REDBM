@@ -1,0 +1,39 @@
+{% extends 'updates/base.html' %}
+{% load thai_dates %}
+{% block title %}{{ department.name }} | THE RED FRONTIER{% endblock %}
+{% block content %}
+<section class="section-heading">
+  <div><p class="eyebrow">พื้นที่ทำงาน · {{ today|thai_date }}</p><h1 class="display-title">ฝ่าย{{ department.name }}</h1></div>
+  <a class="btn btn-outline-red" href="{% url 'log_list' slug=department.slug %}"><i class="bi bi-journal-text" aria-hidden="true"></i> ดูบันทึก</a>
+</section>
+{% if not has_today_log %}
+  <div class="warning-strip"><i class="bi bi-exclamation-circle" aria-hidden="true"></i><span>วันนี้ยังไม่มีบันทึกของฝ่าย{{ department.name }}</span></div>
+{% endif %}
+<div class="d-grid mt-3"><a class="btn btn-primary btn-lg" href="{% url 'log_create' slug=department.slug %}"><i class="bi bi-pencil-square" aria-hidden="true"></i> เขียนบันทึกวันนี้</a></div>
+
+<section>
+  <div class="section-heading"><div><p class="eyebrow">ประกาศและงาน</p><h2>รายการล่าสุด</h2></div><a href="{% url 'notice_list' slug=department.slug %}">ดูทั้งหมด</a></div>
+  {% if notices %}<div class="notice-list">
+    {% for notice in notices %}
+      <article class="notice-entry">
+        <div class="entry-top"><h3>{{ notice.title }}</h3><span class="entry-meta">{% if notice.recipient == 'all' %}ทุกฝ่าย{% else %}{{ notice.get_recipient_display }}{% endif %}</span></div>
+        <p class="entry-preview">{{ notice.content|truncatechars:180 }}</p>
+        {% if notice.deadline %}<div class="entry-meta mt-2">กำหนดส่ง {{ notice.deadline|thai_date }} · {{ notice.get_task_status_display }}</div>{% endif %}
+      </article>
+    {% endfor %}
+  </div>{% else %}<div class="empty-state">ยังไม่มีประกาศ</div>{% endif %}
+</section>
+
+<section>
+  <div class="section-heading"><div><p class="eyebrow">อัปเดตจากทีม</p><h2>บันทึกล่าสุด</h2></div><a href="{% url 'log_list' slug=department.slug %}">ดูทั้งหมด</a></div>
+  {% if latest_logs %}<div class="log-list">
+    {% for log in latest_logs %}
+      <article class="log-entry" style="--dept-color: {{ department.color }}">
+        <div class="entry-top"><h3><a href="{% url 'log_detail' slug=department.slug pk=log.pk %}">{{ log.author_name }}</a></h3><span class="entry-meta">{{ log.date|thai_date }}</span></div>
+        <p class="entry-preview">{{ log.work_done|truncatechars:170 }}</p>
+        <div class="d-flex align-items-center gap-2 mt-3"><div class="progress flex-grow-1" role="progressbar" aria-label="ความคืบหน้า" aria-valuenow="{{ log.progress }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar {% if log.progress < 34 %}progress-low{% elif log.progress < 67 %}progress-medium{% else %}progress-high{% endif %}" style="width:{{ log.progress }}%"></div></div><span class="entry-meta">{{ log.progress }}%</span></div>
+      </article>
+    {% endfor %}
+  </div>{% else %}<div class="empty-state">ยังไม่มีบันทึก เริ่มอัปเดตงานของวันนี้ได้เลย</div>{% endif %}
+</section>
+{% endblock %}

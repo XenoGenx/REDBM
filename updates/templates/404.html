@@ -1,0 +1,9 @@
+{% extends 'updates/base.html' %}
+{% block title %}ไม่พบหน้านี้ | THE RED FRONTIER{% endblock %}
+{% block content %}
+<section class="panel text-center mx-auto" style="max-width:560px">
+  <p class="eyebrow">THE RED FRONTIER</p><h1 class="display-title">ไม่พบหน้านี้</h1>
+  <p class="subtle mt-3">ลิงก์อาจไม่ถูกต้อง หรือหน้านี้ไม่มีอยู่แล้ว</p>
+  <a class="btn btn-primary mt-2" href="{% url 'home' %}"><i class="bi bi-house-door" aria-hidden="true"></i> กลับหน้าแรก</a>
+</section>
+{% endblock %}

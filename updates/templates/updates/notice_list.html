@@ -1,0 +1,14 @@
+{% extends 'updates/base.html' %}
+{% load thai_dates %}
+{% block title %}ประกาศ | {{ department.name }}{% endblock %}
+{% block content %}
+<section class="section-heading"><div><p class="eyebrow">ฝ่าย{{ department.name }}</p><h1 class="display-title">ประกาศและงาน</h1></div></section>
+{% if notices %}<div class="notice-list">
+  {% for notice in notices %}<article class="notice-entry">
+    <div class="entry-top"><h2 class="h5">{{ notice.title }}</h2><span class="entry-meta">{% if notice.recipient == 'all' %}ทุกฝ่าย{% else %}{{ notice.get_recipient_display }}{% endif %}</span></div>
+    <p class="entry-preview">{{ notice.content }}</p>
+    {% if notice.deadline %}<div class="entry-meta mt-3"><i class="bi bi-calendar-event" aria-hidden="true"></i> กำหนดส่ง {{ notice.deadline|thai_date }} · {{ notice.get_task_status_display }}</div>{% endif %}
+    <div class="entry-meta mt-2">โพสต์ {{ notice.created_at|thai_date }}</div>
+  </article>{% endfor %}
+</div>{% else %}<div class="empty-state">ยังไม่มีประกาศหรืองาน</div>{% endif %}
+{% endblock %}

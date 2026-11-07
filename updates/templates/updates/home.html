@@ -1,0 +1,36 @@
+{% extends 'updates/base.html' %}
+{% load static %}
+{% block body_class %}home-page{% endblock %}
+{% block title %}THE RED FRONTIER | คณะสีแดง{% endblock %}
+{% block content %}
+<section class="home-hero">
+  <img class="home-poster" src="{% static 'images/banner.png' %}" alt="โปสเตอร์ THE RED FRONTIER พร้อมภูมิทัศน์ตะวันตกและคณะสีแดง">
+  <img class="home-banner-logo" src="{% static 'images/765035349_18075698117453309_3068222861121545458_n.jpg' %}" alt="ตราคณะสีแดงเบญจมะ">
+  <div class="home-hero-shade" aria-hidden="true"></div>
+  <h1 class="visually-hidden">THE RED FRONTIER</h1>
+</section>
+<section class="home-departments" aria-labelledby="choose-department">
+  <div class="home-section-heading"><p>เลือกฝ่ายเพื่อเริ่มใช้งาน</p><h2 id="choose-department">พื้นที่ทำงาน</h2></div>
+  <div class="department-list">
+    {% for slug, data in departments.items %}
+      <a class="department-row" style="--dept-color: {{ data.color }}" href="{% url 'department_home' slug=slug %}" data-department-name="{{ data.name }}">
+        <span class="department-symbol" aria-hidden="true">
+          {% if slug == 'stan' %}<i class="bi bi-megaphone-fill"></i>
+          {% elif slug == 'kabuan' %}<i class="bi bi-signpost-split-fill"></i>
+          {% else %}<i class="bi bi-lightning-charge-fill"></i>{% endif %}
+        </span>
+        <span class="department-row-copy"><strong>{{ data.name }}</strong><span>เข้าสู่พื้นที่ทำงาน</span></span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+<div class="home-president"><a class="president-link" href="{% url 'president_login' %}"><i class="bi bi-shield-lock" aria-hidden="true"></i> ประธานสี</a></div>
+<dialog class="department-dialog" id="department-dialog" aria-labelledby="department-dialog-title">
+  <form method="dialog" class="department-dialog-dismiss"><button class="department-dialog-close" aria-label="ปิดหน้าต่าง"><i class="bi bi-x-lg" aria-hidden="true"></i></button></form>
+  <div class="department-dialog-art" aria-hidden="true"><span class="department-dialog-emblem"><i class="bi bi-stars"></i></span></div>
+  <p class="department-dialog-kicker">THE RED FRONTIER</p>
+  <h2 id="department-dialog-title" class="department-dialog-title"></h2>
+  <p class="department-dialog-copy">พร้อมอัปเดตงานของฝ่ายแล้ว</p>
+  <a class="department-dialog-enter" href="#"><span>เข้าสู่ฝ่าย</span><i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+</dialog>
+{% endblock %}

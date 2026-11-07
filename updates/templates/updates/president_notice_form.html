@@ -1,0 +1,15 @@
+{% extends 'updates/base.html' %}
+{% block title %}{{ page_title }} | THE RED FRONTIER{% endblock %}
+{% block content %}
+<section class="section-heading"><div><p class="eyebrow">สำหรับประธานสี</p><h1 class="display-title">{{ page_title }}</h1></div></section>
+<form class="panel" method="post" novalidate>
+  {% csrf_token %}
+  {% for error in form.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+  {% include 'updates/_field.html' with field=form.title %}
+  {% include 'updates/_field.html' with field=form.content %}
+  {% include 'updates/_field.html' with field=form.recipient %}
+  {% include 'updates/_field.html' with field=form.deadline %}
+  {% include 'updates/_field.html' with field=form.task_status %}
+  <button class="btn btn-primary w-100" type="submit"><i class="bi bi-check2-circle" aria-hidden="true"></i> บันทึก</button>
+</form>
+{% endblock %}

@@ -1,0 +1,3 @@
+{% if log.status == 'normal' %}<span class="status-tag status-normal"><i class="bi bi-check-circle" aria-hidden="true"></i> ปกติ</span>
+{% elif log.status == 'issue' %}<span class="status-tag status-issue"><i class="bi bi-exclamation-circle" aria-hidden="true"></i> มีปัญหา</span>
+{% else %}<span class="status-tag status-urgent"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i> ต้องช่วยด่วน</span>{% endif %}

@@ -1,0 +1,29 @@
+{% extends 'updates/base.html' %}
+{% load thai_dates %}
+{% block title %}บันทึก | {{ department.name }}{% endblock %}
+{% block content %}
+<section class="section-heading">
+  <div><p class="eyebrow">ฝ่าย{{ department.name }}</p><h1 class="display-title">บันทึกงาน</h1></div>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-red" href="{% url 'department_home' slug=department.slug %}"><i class="bi bi-arrow-left" aria-hidden="true"></i> ย้อนกลับ</a>
+    <a class="btn btn-primary" href="{% url 'log_create' slug=department.slug %}"><i class="bi bi-plus-lg" aria-hidden="true"></i> เขียนวันนี้</a>
+  </div>
+</section>
+{% if logs %}<div class="log-list">
+  {% for log in logs %}
+    <article class="log-entry" style="--dept-color: {{ department.color }}">
+      <div class="entry-top"><div><h2 class="h5 mb-1"><a href="{% url 'log_detail' slug=department.slug pk=log.pk %}">{{ log.author_name }}</a></h2><div class="entry-meta">{{ log.date|thai_date }}</div></div>{% include 'updates/_status.html' %}</div>
+      <p class="entry-preview">{{ log.work_done|truncatechars:240 }}</p>
+      <div class="d-flex align-items-center gap-2 mt-3"><div class="progress flex-grow-1"><div class="progress-bar {% if log.progress < 34 %}progress-low{% elif log.progress < 67 %}progress-medium{% else %}progress-high{% endif %}" style="width:{{ log.progress }}%"></div></div><span class="entry-meta">{{ log.progress }}%</span></div>
+      <div class="d-flex flex-wrap gap-3 mt-3 entry-meta"><span><i class="bi bi-image" aria-hidden="true"></i> {{ log.photos.count }} รูป</span><span><i class="bi bi-chat-dots" aria-hidden="true"></i> {{ log.comments.count }} ความคิดเห็น</span></div>
+      {% if log.date == today %}
+        {% if request.session.president_authenticated %}
+          <a class="btn btn-outline-red mt-3" href="{% url 'log_detail' slug=department.slug pk=log.pk %}"><i class="bi bi-eye" aria-hidden="true"></i> ดูบันทึกวันนี้</a>
+        {% else %}
+          <a class="btn btn-outline-red mt-3" href="{% url 'log_edit' slug=department.slug pk=log.pk %}"><i class="bi bi-pencil" aria-hidden="true"></i> แก้ไขบันทึกวันนี้</a>
+        {% endif %}
+      {% endif %}
+    </article>
+  {% endfor %}
+</div>{% else %}<div class="empty-state">ยังไม่มีบันทึกของฝ่ายนี้</div>{% endif %}
+{% endblock %}

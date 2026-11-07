@@ -1,0 +1,32 @@
+{% extends 'updates/base.html' %}
+{% load thai_dates %}
+{% block title %}บันทึกของ {{ log.author_name }} | {{ department.name }}{% endblock %}
+{% block content %}
+<section class="section-heading"><div><p class="eyebrow">ฝ่าย{{ department.name }} · {{ log.date|thai_date }}</p><h1 class="display-title">{{ log.author_name }}</h1></div>{% include 'updates/_status.html' %}</section>
+<article class="panel mb-4">
+  <div class="entry-top"><h2 class="h5">สิ่งที่ทำ</h2><span class="entry-meta">{{ log.created_at|thai_date }}</span></div>
+  <p class="entry-preview">{{ log.work_done }}</p>
+  <div class="d-flex align-items-center gap-2 mt-4"><div class="progress flex-grow-1" role="progressbar" aria-label="ความคืบหน้า" aria-valuenow="{{ log.progress }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar {% if log.progress < 34 %}progress-low{% elif log.progress < 67 %}progress-medium{% else %}progress-high{% endif %}" style="width:{{ log.progress }}%"></div></div><strong>{{ log.progress }}%</strong></div>
+  {% if log.issue %}<h2 class="h6 mt-4">ปัญหาที่พบ</h2><p class="entry-preview">{{ log.issue }}</p>{% endif %}
+  {% if log.status != 'normal' %}<p class="mt-3 mb-0">{% if log.is_resolved %}<span class="status-tag status-normal"><i class="bi bi-check-circle" aria-hidden="true"></i> แก้ปัญหาแล้ว</span>{% else %}<span class="status-tag status-issue">ยังไม่ได้แก้ปัญหา</span>{% endif %}</p>{% endif %}
+  <div class="d-flex flex-wrap gap-2 mt-4">
+    {% if log.date == today and not request.session.president_authenticated %}<a class="btn btn-outline-red" href="{% url 'log_edit' slug=department.slug pk=log.pk %}"><i class="bi bi-pencil" aria-hidden="true"></i> แก้ไขบันทึกวันนี้</a>{% endif %}
+    {% if log.status != 'normal' and not log.is_resolved %}<form method="post" action="{% url 'mark_resolved' slug=department.slug pk=log.pk %}">{% csrf_token %}<button class="btn btn-gold" type="submit"><i class="bi bi-check2" aria-hidden="true"></i> แก้ปัญหาแล้ว</button></form>{% endif %}
+    {% if request.session.president_authenticated %}<form method="post" action="{% url 'president_log_delete' pk=log.pk %}" onsubmit="return confirm('ยืนยันลบบันทึกนี้?')">{% csrf_token %}<button class="btn btn-danger-soft" type="submit"><i class="bi bi-trash" aria-hidden="true"></i> ลบบันทึก</button></form>{% endif %}
+  </div>
+</article>
+{% if log.photos.all %}<section class="mb-4"><div class="section-heading"><h2>รูปประกอบ</h2></div><div class="photo-grid">
+  {% for photo in log.photos.all %}<div class="photo-frame"><button class="photo-preview-trigger" type="button" data-photo-src="{{ photo.image.url }}" aria-label="ดูรูปประกอบบันทึกขนาดใหญ่"><img src="{{ photo.image.url }}" alt="รูปประกอบบันทึก"></button>{% if request.session.president_authenticated %}<form class="photo-actions" method="post" action="{% url 'president_photo_delete' pk=photo.pk %}" onsubmit="return confirm('ยืนยันลบรูปนี้?')">{% csrf_token %}<button class="btn btn-danger-soft" type="submit" aria-label="ลบรูป"><i class="bi bi-trash" aria-hidden="true"></i></button></form>{% endif %}</div>{% endfor %}
+</div></section>{% endif %}
+<dialog class="photo-viewer" id="photo-viewer" aria-label="ดูรูปประกอบบันทึก">
+  <form method="dialog" class="photo-viewer-dismiss"><button class="photo-viewer-close" aria-label="ปิดรูป"><i class="bi bi-x-lg" aria-hidden="true"></i></button></form>
+  <img class="photo-viewer-image" alt="รูปประกอบบันทึกขนาดใหญ่">
+</dialog>
+<section class="panel mb-4">
+  <div class="section-heading mt-0"><h2>ความคิดเห็น ({{ log.comments.count }})</h2></div>
+  {% for comment in log.comments.all %}
+    <div class="comment-item"><div class="entry-top"><strong>{{ comment.author_name }}</strong><time class="entry-meta">{{ comment.created_at|thai_date }}</time></div><p class="mb-1 mt-2">{{ comment.message }}</p>{% if request.session.president_authenticated %}<form method="post" action="{% url 'president_comment_delete' pk=comment.pk %}" onsubmit="return confirm('ยืนยันลบความคิดเห็นนี้?')">{% csrf_token %}<button class="btn btn-danger-soft mt-2" type="submit"><i class="bi bi-trash" aria-hidden="true"></i> ลบความคิดเห็น</button></form>{% endif %}</div>
+  {% empty %}<p class="subtle">ยังไม่มีความคิดเห็น</p>{% endfor %}
+  <form method="post" class="mt-3" novalidate>{% csrf_token %}{% include 'updates/_field.html' with field=form.author_name %}{% include 'updates/_field.html' with field=form.message %}<button class="btn btn-primary" type="submit"><i class="bi bi-send" aria-hidden="true"></i> ส่งความคิดเห็น</button></form>
+</section>
+{% endblock %}

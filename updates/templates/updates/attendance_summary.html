@@ -1,0 +1,8 @@
+{% extends 'updates/base.html' %}
+{% block title %}สรุปการมา | {{ department.name }}{% endblock %}
+{% block content %}
+<section class="section-heading"><div><p class="eyebrow">ฝ่าย{{ department.name }}</p><h1 class="display-title">สรุปการมา</h1></div><a class="btn btn-outline-red" href="{% url 'attendance' slug=department.slug %}"><i class="bi bi-arrow-left" aria-hidden="true"></i> กลับไปเช็คชื่อ</a></section>
+{% if people %}<div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>ชื่อ</th><th class="text-center">มา</th><th class="text-center">ขาด</th><th class="text-center">ลา</th></tr></thead><tbody>
+  {% for person in people %}<tr><th scope="row">{{ person.name }}</th><td class="text-center">{{ person.present_days }}</td><td class="text-center">{{ person.absent_days }}</td><td class="text-center">{{ person.leave_days }}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="empty-state">ยังไม่มีรายชื่อให้สรุป</div>{% endif %}
+{% endblock %}

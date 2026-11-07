@@ -1,0 +1,53 @@
+{% extends 'updates/base.html' %}
+{% load thai_dates %}
+{% block title %}{{ page_title }} | {{ department.name }}{% endblock %}
+{% block content %}
+<section class="section-heading"><div><p class="eyebrow">ฝ่าย{{ department.name }} · {{ today|thai_date }}</p><h1 class="display-title">{{ page_title }}</h1></div></section>
+<form class="panel" method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  {% for error in form.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+  {% include 'updates/_field.html' with field=form.author_name %}
+  {% include 'updates/_field.html' with field=form.work_done %}
+  <fieldset class="progress-choice-group mb-4">
+    <legend class="form-label">ความคืบหน้าวันนี้</legend>
+    {% with progress_value=form.progress.value|default_if_none:0|add:"0" %}
+      <div class="progress-choices">
+        <div class="progress-choice progress-choice-high">
+          <input type="radio" name="{{ form.progress.html_name }}" id="progress-high" value="100" {% if form.is_bound or log %}{% if progress_value >= 67 %}checked{% endif %}{% endif %}>
+          <label for="progress-high"><i class="bi bi-stars" aria-hidden="true"></i><strong>วันนี้เริ่ดน้าาาแม่
+        
+          </strong><span>100%</span></label>
+        </div>
+        <div class="progress-choice progress-choice-medium">
+          <input type="radio" name="{{ form.progress.html_name }}" id="progress-medium" value="60" {% if form.is_bound or log %}{% if progress_value >= 34 and progress_value < 67 %}checked{% endif %}{% else %}checked{% endif %}>
+          <label for="progress-medium"><i class="bi bi-lightning-charge" aria-hidden="true"></i><strong>ทำดีค่าาา</strong><span>60%</span></label>
+        </div>
+        <div class="progress-choice progress-choice-low">
+          <input type="radio" name="{{ form.progress.html_name }}" id="progress-low" value="20" {% if form.is_bound or log %}{% if progress_value < 34 %}checked{% endif %}{% endif %}>
+          <label for="progress-low"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><strong>ยังไม่ปังนะแม่</strong><span>20%</span></label>
+        </div>
+      </div>
+    {% endwith %}
+    {% for error in form.progress.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+  </fieldset>
+  {% include 'updates/_field.html' with field=form.issue %}
+  <fieldset class="mb-4">
+    <legend class="form-label">สถานะงาน</legend>
+    <div class="status-options">
+      {% for value, label in form.status.field.choices %}
+        <div class="status-option"><input type="radio" name="{{ form.status.html_name }}" id="status-{{ value }}" value="{{ value }}" {% if form.status.value == value %}checked{% elif not form.status.value and value == 'normal' %}checked{% endif %}><label for="status-{{ value }}"><i class="bi {% if value == 'normal' %}bi-check-circle{% elif value == 'issue' %}bi-exclamation-circle{% else %}bi-exclamation-triangle{% endif %}" aria-hidden="true"></i>{{ label }}</label></div>
+      {% endfor %}
+    </div>
+    {% for error in form.status.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+  </fieldset>
+  <div class="mb-4">
+    <label class="form-label" for="photos">เพิ่มรูป</label>
+    <input class="form-control" id="photos" name="photos" type="file" accept="image/*" capture="environment" multiple>
+    <div class="form-text">เลือกได้หลายรูป รูปละไม่เกิน 10 MB</div>
+  </div>
+  <button class="btn btn-primary w-100" type="submit"><i class="bi bi-check2-circle" aria-hidden="true"></i> บันทึก</button>
+</form>
+{% if log and log.photos.all %}
+  <section class="mt-4"><h2 class="h5 mb-3">รูปที่แนบไว้แล้ว</h2><div class="photo-grid">{% for photo in log.photos.all %}<div class="photo-frame"><img src="{{ photo.image.url }}" alt="รูปประกอบบันทึก"></div>{% endfor %}</div></section>
+{% endif %}
+{% endblock %}
